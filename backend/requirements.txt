@@ -1,0 +1,28 @@
+# ==============================================================================
+# TileForge AI - Backend Dependencies
+# ==============================================================================
+
+# Core Web Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.6.0
+python-multipart>=0.0.7
+
+# Computer Vision & Image Processing
+numpy>=1.24.3
+pillow>=10.2.0
+opencv-python-headless>=4.9.0.80
+scipy>=1.11.0
+
+# Deep Learning & Diffusion Pipelines (SD-Turbo)
+# For GPU CUDA acceleration: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch>=2.1.2
+torchvision>=0.16.2
+diffusers>=0.26.0
+transformers>=4.37.0
+accelerate>=0.27.0
+
+# Utilities & Fallbacks
+requests>=2.31.0
+pyngrok>=7.1.0
+tqdm>=4.66.0

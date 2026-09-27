@@ -1,0 +1,114 @@
+================================================================================
+TileForge AI - Curated & Pre-Tested Prompt Presets Cheatsheet
+================================================================================
+
+These presets are specifically tuned for sub-second generation with SD-Turbo,
+ensuring crisp 2D textures, high normal-map depth contrast, and optimal physics silhouettes.
+
+--------------------------------------------------------------------------------
+1. ANCIENT DUNGEON COBBLESTONE
+--------------------------------------------------------------------------------
+Prompt:
+weathered ancient dungeon cobblestone wall, grey mossy stones, dark mortar, flat 2d game texture, seamless platformer tile, top-down orthographic, high contrast relief, crisp details
+
+Negative Prompt:
+blurry, 3d perspective, isometric, shadows cast outside, vignette, watermarks, character, hands, text, noisy
+
+Recommended Parameters:
+- Steps: 2
+- Guidance Scale: 1.5
+- Seamless: true
+- Normal Map Strength: 2.8
+- Collider Tolerance (RDP Epsilon): 2.5
+- Use Case: Dungeon crawlers, Castle ruins platformer terrain
+
+
+--------------------------------------------------------------------------------
+2. VOLCANIC OBSIDIAN & LAVA VEINS
+--------------------------------------------------------------------------------
+Prompt:
+cracked volcanic obsidian rock tile, glowing molten orange magma veins, jagged basalt stones, flat 2d game texture, seamless texture, dark volcanic crust, vivid emissive fissures
+
+Negative Prompt:
+blurry, low contrast, 3d perspective angle, horizon, smooth plastic, human, text
+
+Recommended Parameters:
+- Steps: 2
+- Guidance Scale: 1.8
+- Seamless: true
+- Normal Map Strength: 3.2
+- Collider Tolerance: 2.0
+- Use Case: Hell / Volcanic biome floors and background walls
+
+
+--------------------------------------------------------------------------------
+3. CYBERPUNK NEON CIRCUITRY
+--------------------------------------------------------------------------------
+Prompt:
+futuristic sci-fi spaceship hull panel, dark brushed steel metal plates, glowing cyan neon circuitry lines, hexagonal rivets, clean hard-surface 2d game texture, seamless flat pattern
+
+Negative Prompt:
+organic, dirt, blurry, isometric, fish-eye, camera tilt, text, human, messy sketch
+
+Recommended Parameters:
+- Steps: 2
+- Guidance Scale: 1.4
+- Seamless: true
+- Normal Map Strength: 2.2
+- Collider Tolerance: 1.5
+- Use Case: Sci-fi platformers, cyberpunk spaceship interiors
+
+
+--------------------------------------------------------------------------------
+4. ENCHANTED FOREST WOOD PLANKS
+--------------------------------------------------------------------------------
+Prompt:
+weathered aged dark oak wood planks, ancient elven golden glowing runes carved into timber, leafy vines creeping, flat 2d texture, high detail grain, seamless fantasy tile
+
+Negative Prompt:
+modern, plastic, blurry, distorted, 3d view, perspective tilt, watermark
+
+Recommended Parameters:
+- Steps: 2
+- Guidance Scale: 1.6
+- Seamless: true
+- Normal Map Strength: 2.5
+- Collider Tolerance: 2.0
+- Use Case: Mystical forest bridges, treehouse platforms, enchanted cabins
+
+
+--------------------------------------------------------------------------------
+5. AMETHYST CRYSTAL CAVERN
+--------------------------------------------------------------------------------
+Prompt:
+dark underground cave bedrock embedded with vibrant purple amethyst crystal cluster facets, crystalline geode, flat orthographic 2d game texture, crisp sharp mineral edges, seamless
+
+Negative Prompt:
+blurry, low resolution, mud, character, 3d rendering artifact, sphere preview
+
+Recommended Parameters:
+- Steps: 3
+- Guidance Scale: 1.7
+- Seamless: true
+- Normal Map Strength: 3.0
+- Collider Tolerance: 1.8
+- Use Case: Mining games, crystal caves, gem mines
+
+
+--------------------------------------------------------------------------------
+6. STEAMPUNK RUSTED BRASS TILES
+--------------------------------------------------------------------------------
+Prompt:
+steampunk industrial brass and copper metal tiles, heavy bolts, rusted metal edges, steam vents, flat 2d platformer texture, seamless repeating pattern, high texture detail
+
+Negative Prompt:
+cartoon, lowres, blurry, perspective angle, round balls, text
+
+Recommended Parameters:
+- Steps: 2
+- Guidance Scale: 1.5
+- Seamless: true
+- Normal Map Strength: 2.6
+- Collider Tolerance: 2.0
+- Use Case: Factory levels, clockwork towers, steampunk airships
+================================================================================

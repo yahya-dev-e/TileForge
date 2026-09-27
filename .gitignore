@@ -1,0 +1,102 @@
+# ==========================================
+# TileForge AI - Combined Unity & Python .gitignore
+# ==========================================
+
+# ------------------------------------------
+# Python & Backend
+# ------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyTorch & Model weights cache
+*.pt
+*.pth
+*.bin
+*.onnx
+*.engine
+*.safetensors
+models/
+weights/
+checkpoints/
+.cache/
+huggingface/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Environment variables & secrets
+.env
+.env.local
+*.env
+ngrok_token.txt
+
+# ------------------------------------------
+# Unity
+# ------------------------------------------
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Aa]ssets/AssetStoreTools*
+
+# Visual Studio / VS Code / Rider cache
+.vs/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# Unity Generated crash logs & diagnostics
+sysinfo.txt
+*.stackdump
+
+# Unity auto-generated asset meta files that shouldn't be tracked for temp folders
+/[Aa]ssets/[Gg]enerated/temp_*
+
+# ------------------------------------------
+# OS & System
+# ------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini

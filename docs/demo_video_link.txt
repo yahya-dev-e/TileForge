@@ -1,0 +1,36 @@
+================================================================================
+TileForge AI - 90-Second Hackathon Demo Video Submission
+================================================================================
+
+Demo Video Link:
+https://youtu.be/tileforge-ai-demo-submission
+(Or check Google Drive / Loom demo backup: https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+
+--------------------------------------------------------------------------------
+90-Second Video Script & Breakdown:
+--------------------------------------------------------------------------------
+[00:00 - 00:15] The Problem:
+- Game developers and level designers spend hours hunting or hand-crafting 2D tiles, baking normal maps in Blender, and hand-tracing 2D physics colliders.
+- Introduction to TileForge AI: Instant, in-engine AI generation for Unity 2022.3 LTS.
+
+[00:15 - 00:35] Unity Editor Integration & Real-Time Generation:
+- Open Unity Editor: Window > TileForge > Level Generator.
+- Select preset: "Volcanic Obsidian with Glowing Lava Veins".
+- Click "Generate Tile & Material".
+- Sub-second roundtrip via SD-Turbo backend (~350ms).
+- Live preview showing both Diffuse Map and Tangent-Space Normal Map.
+
+[00:35 - 00:55] Under the Hood: Seamless Tiling & Normal Map Baker:
+- Visual comparison showing standard AI image vs. TileForge seamless boundary wrap.
+- Instant Sobel vector transformation yielding tangent-space normal maps compliant with Unity URP 2D Lit Shaders.
+- Automatic contour polygon collider simplification (OpenCV RDP).
+
+[00:55 - 01:20] Interactive Demo Sandbox:
+- Hit "Play" in Unity DemoSandbox.unity scene.
+- Player character jumps on the newly generated tiles with physical collision.
+- Dynamic 2D point light follows the mouse cursor, revealing deep physical reliefs and normal reflections on the 2D tiles.
+
+[01:20 - 01:30] Conclusion & Tech Stack:
+- Built with PyTorch, SD-Turbo, FastAPI, OpenCV, and Unity URP 2D.
+- Open-source and ready for game jams and indie creators.
+================================================================================
