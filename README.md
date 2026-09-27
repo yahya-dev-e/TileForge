@@ -156,6 +156,17 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 The server will be available at `http://127.0.0.1:8000`. You can test endpoints via Swagger UI at `http://127.0.0.1:8000/docs`.
 
+### Backend Automated Tests
+
+Install the development dependencies and run the backend test suite from the repository root:
+
+```bash
+python -m pip install -r backend/requirements-dev.txt
+pytest -q backend/tests
+```
+
+The suite validates seamless edge processing, normal-map generation, polygon extraction, the procedural fallback, and the `/api/v1/generate-tile` response contract. It does not download or load SD-Turbo weights.
+
 ---
 
 ### Option B: Cloud GPU (Brev / Lambda / RunPod)
