@@ -43,10 +43,11 @@ MAX_VERTICES = 20
 
 
 def _ensure_placeholder_raw_images() -> None:
-    """Creates synthetic RGBA tiles if test_data/raw/ is empty, so this script
-    has something to run on before the curated sprites land in that folder."""
+    """Creates synthetic RGBA tiles if test_data/raw/ (including subfolders) is
+    empty, so this script has something to run on before the curated sprites
+    land in that folder."""
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    if any(RAW_DIR.glob("*.png")):
+    if any(RAW_DIR.rglob("*.png")):
         return
 
     print(f"No PNGs found in {RAW_DIR} yet - generating placeholder tiles.")
@@ -80,18 +81,22 @@ def _normal_map_is_plausible(normal_arr: np.ndarray) -> bool:
 
 
 def run_pipeline_on(image_path: Path) -> bool:
-    print(f"--- {image_path.name} ---")
+    # Flatten the path relative to raw/ (e.g. "Colored/tile_0000") so files that
+    # share a filename across category subfolders don't overwrite each other's
+    # processed/ output.
+    label = str(image_path.relative_to(RAW_DIR).with_suffix("")).replace("/", "_")
+    print(f"--- {label} ---")
     source = Image.open(image_path).convert("RGBA")
 
     seamless = apply_seamless_tiling(source)
     seamless_ok = verify_tile_seamlessness(seamless)
-    seamless.save(PROCESSED_DIR / f"{image_path.stem}_seamless.png")
+    seamless.save(PROCESSED_DIR / f"{label}_seamless.png")
     print(f"  seamless wrap: {'OK' if seamless_ok else 'FAIL'} (verify_tile_seamlessness)")
 
     normal = bake_normal_map(seamless)
     normal_arr = np.asarray(normal)
     normal_ok = _normal_map_is_plausible(normal_arr)
-    normal.save(PROCESSED_DIR / f"{image_path.stem}_normal.png")
+    normal.save(PROCESSED_DIR / f"{label}_normal.png")
     mean_rgb = tuple(round(float(normal_arr[..., c].mean()), 1) for c in range(3))
     print(f"  normal map: {'OK' if normal_ok else 'CHECK'} (mean RGB = {mean_rgb})")
 
@@ -109,8 +114,8 @@ def main() -> None:
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     _ensure_placeholder_raw_images()
 
-    images = sorted(RAW_DIR.glob("*.png"))
-    results = {img.name: run_pipeline_on(img) for img in images}
+    images = sorted(RAW_DIR.rglob("*.png"))
+    results = {str(img.relative_to(RAW_DIR)): run_pipeline_on(img) for img in images}
 
     passed = sum(results.values())
     print(f"{passed}/{len(results)} tile(s) passed all checks. Outputs written to {PROCESSED_DIR}")
