@@ -47,6 +47,13 @@ huggingface/
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
+# backend/test_pipeline.py artifacts: always regenerated, never real curated
+# assets. Placeholder tiles are auto-synthesized by the script when
+# test_data/raw/ is empty; real curated sprites (non "placeholder_*" names)
+# are tracked normally once the team drops them in.
+backend/test_data/raw/placeholder_*.png
+backend/test_data/processed/
+
 # Environment variables & secrets
 .env
 .env.local
