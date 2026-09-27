@@ -177,6 +177,11 @@ chmod +x backend/setup_cloud.sh
 ./backend/setup_cloud.sh
 ```
 
+> ⚠️ **Set an API key before exposing this publicly.** The server has no authentication by default.
+> Export `TILEFORGE_API_KEY=<your-secret>` before starting `uvicorn`, then paste the same value into the
+> **API Key** field of the TileForge Window in Unity — otherwise anyone with the URL can trigger (billable)
+> GPU inference.
+
 ---
 
 ### Option C: Google Colab Fallback (Free T4 GPU)
@@ -184,8 +189,9 @@ chmod +x backend/setup_cloud.sh
 1. Open `backend/colab_fallback.ipynb` in [Google Colab](https://colab.research.google.com/).
 2. Select **Runtime > Change runtime type > T4 GPU**.
 3. Enter your free [ngrok auth token](https://ngrok.com/).
-4. Run all cells. Copy the generated public URL (e.g., `https://xyz.ngrok-free.app`).
-5. Paste this URL into the **TileForge Window** inside Unity.
+4. Set a `TILEFORGE_API_KEY` before launching the server so the public ngrok tunnel isn't wide open.
+5. Run all cells. Copy the generated public URL (e.g., `https://xyz.ngrok-free.app`).
+6. Paste this URL and your API key into the **TileForge Window** inside Unity.
 
 ---
 
@@ -210,6 +216,10 @@ chmod +x backend/setup_cloud.sh
 
 ### `POST /api/v1/generate-tile`
 Generates diffuse tile, seamless tiling wrap, tangent-space normal map, and polygon colliders in a single call.
+
+If the server is started with a `TILEFORGE_API_KEY` environment variable set, this endpoint requires a matching
+`X-API-Key` header on every request (returns `401` otherwise). The key is unset by default for local development;
+set it before exposing the server publicly (cloud GPU / ngrok deployments).
 
 #### Request Body
 ```json
@@ -238,20 +248,28 @@ Generates diffuse tile, seamless tiling wrap, tangent-space normal map, and poly
   "color_map_base64": "iVBORw0KGgoAAAANSUhEUgAAAgAAAAI...",
   "normal_map_base64": "iVBORw0KGgoAAAANSUhEUgAAAgAAAAI...",
   "collider_polygons": [
-    [
-      {"x": -0.5, "y": -0.5},
-      {"x": 0.5, "y": -0.5},
-      {"x": 0.5, "y": 0.5},
-      {"x": -0.5, "y": 0.5}
-    ]
+    {
+      "points": [
+        {"x": -0.5, "y": -0.5},
+        {"x": 0.5, "y": -0.5},
+        {"x": 0.5, "y": 0.5},
+        {"x": -0.5, "y": 0.5}
+      ]
+    }
   ],
   "metadata": {
     "engine": "SD-Turbo",
+    "device": "cuda",
+    "gpu_name": "NVIDIA RTX 4090",
     "seamless": true,
+    "steps": 2,
     "normal_strength": 2.5
   }
 }
 ```
+
+Each entry in `collider_polygons` is wrapped in a `points` object (rather than a bare nested array) so that
+Unity's `JsonUtility`, which cannot deserialize nested collections, can parse the list directly.
 
 ---
 

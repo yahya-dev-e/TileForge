@@ -10,12 +10,19 @@ class Point2D(BaseModel):
     y: float = Field(..., description="Normalized Y coordinate in range [-0.5, 0.5]")
 
 
+class ColliderPolygon(BaseModel):
+    """A single simplified polygon vertex loop, wrapped so clients using flat
+    (non-nested-collection) JSON deserializers, such as Unity's JsonUtility,
+    can parse a list of these without hitting nested-list limitations."""
+    points: List[Point2D]
+
+
 class TileRequest(BaseModel):
     """Configuration payload for sub-second tile generation."""
     prompt: str = Field(
         ...,
         description="Text description of the tile texture.",
-        example="weathered ancient dungeon cobblestone wall, grey mossy stones, seamless flat 2d game texture"
+        json_schema_extra={"example": "weathered ancient dungeon cobblestone wall, grey mossy stones, seamless flat 2d game texture"}
     )
     negative_prompt: str = Field(
         default="blurry, low quality, 3d perspective, isometric, shadows cast outside, vignette, watermarks, text, noisy",
@@ -47,7 +54,7 @@ class TileResponse(BaseModel):
     generation_time_ms: float
     color_map_base64: str = Field(..., description="Base64 PNG encoded diffuse texture.")
     normal_map_base64: Optional[str] = Field(default=None, description="Base64 PNG encoded tangent normal map.")
-    collider_polygons: List[List[Point2D]] = Field(default_factory=list, description="Simplified 2D polygon vertex loops.")
+    collider_polygons: List[ColliderPolygon] = Field(default_factory=list, description="Simplified 2D polygon vertex loops.")
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
 

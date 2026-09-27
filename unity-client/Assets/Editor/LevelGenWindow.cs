@@ -27,6 +27,8 @@ namespace TileForge.Editor
         [Serializable]
         public class PolygonListWrapper
         {
+            // JsonUtility cannot deserialize nested collections (e.g. List<List<T>>),
+            // so each polygon is wrapped in its own named "points" field instead.
             public List<Point2DData> points;
         }
 
@@ -57,7 +59,7 @@ namespace TileForge.Editor
             public float generation_time_ms;
             public string color_map_base64;
             public string normal_map_base64;
-            public List<List<Point2DData>> collider_polygons;
+            public List<PolygonListWrapper> collider_polygons;
         }
 
         [Serializable]
@@ -72,6 +74,7 @@ namespace TileForge.Editor
 
         // GUI State & Parameters
         private string serverUrl = DEFAULT_SERVER_URL;
+        private string apiKey = "";
         private string assetPrefix = "DungeonTile_01";
         private string prompt = "weathered ancient dungeon cobblestone wall, grey mossy stones, dark mortar, flat 2d game texture, seamless platformer tile, top-down orthographic";
         private string negativePrompt = "blurry, 3d perspective, isometric, shadows, vignette, watermarks, character, noisy";
@@ -170,6 +173,8 @@ namespace TileForge.Editor
                 TestBackendConnection();
             }
             EditorGUILayout.EndHorizontal();
+
+            apiKey = EditorGUILayout.PasswordField("API Key (if server requires one)", apiKey);
 
             EditorGUILayout.BeginHorizontal();
             GUIStyle statusDotStyle = new GUIStyle(EditorStyles.label);
@@ -344,6 +349,10 @@ namespace TileForge.Editor
             string url = serverUrl.TrimEnd('/') + "/health";
             UnityWebRequest req = UnityWebRequest.Get(url);
             req.timeout = 5;
+            if (!string.IsNullOrEmpty(apiKey))
+            {
+                req.SetRequestHeader("X-API-Key", apiKey);
+            }
 
             var op = req.SendWebRequest();
             op.completed += _ =>
@@ -403,6 +412,10 @@ namespace TileForge.Editor
             req.uploadHandler = new UploadHandlerRaw(bodyRaw);
             req.downloadHandler = new DownloadHandlerBuffer();
             req.SetRequestHeader("Content-Type", "application/json");
+            if (!string.IsNullOrEmpty(apiKey))
+            {
+                req.SetRequestHeader("X-API-Key", apiKey);
+            }
             req.timeout = 45;
 
             var op = req.SendWebRequest();
@@ -455,6 +468,52 @@ namespace TileForge.Editor
             Debug.Log($"[TileForge] Generated tile in {lastResponse.generation_time_ms} ms (Seed: {lastResponse.seed})");
         }
 
+        /// Strips path separators, "..", and other invalid filename characters so
+        /// the user-editable Asset Output Name field can't write outside GENERATED_FOLDER.
+        private static string SanitizeAssetPrefix(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return "TileForge_Tile";
+            }
+
+            string cleaned = raw.Replace("..", "_");
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                cleaned = cleaned.Replace(c, '_');
+            }
+            cleaned = cleaned.Replace('/', '_').Replace('\\', '_').Trim();
+
+            return string.IsNullOrEmpty(cleaned) ? "TileForge_Tile" : cleaned;
+        }
+
+        /// Uses the first polygon returned by the backend's collider extraction,
+        /// falling back to a default unit-square box if none was returned or requested.
+        private Vector2[] BuildColliderPoints()
+        {
+            if (lastResponse?.collider_polygons != null && lastResponse.collider_polygons.Count > 0)
+            {
+                List<Point2DData> srcPoints = lastResponse.collider_polygons[0].points;
+                if (srcPoints != null && srcPoints.Count >= 3)
+                {
+                    Vector2[] pts = new Vector2[srcPoints.Count];
+                    for (int i = 0; i < srcPoints.Count; i++)
+                    {
+                        pts[i] = new Vector2(srcPoints[i].x, srcPoints[i].y);
+                    }
+                    return pts;
+                }
+            }
+
+            return new Vector2[]
+            {
+                new Vector2(-0.5f, -0.5f),
+                new Vector2(0.5f, -0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(-0.5f, 0.5f)
+            };
+        }
+
         private void SaveGeneratedAssetsToProject(bool spawnInScene)
         {
             if (previewDiffuseTexture == null)
@@ -468,9 +527,10 @@ namespace TileForge.Editor
                 Directory.CreateDirectory(GENERATED_FOLDER);
             }
 
-            string diffusePath = $"{GENERATED_FOLDER}/{assetPrefix}_Diffuse.png";
-            string normalPath = $"{GENERATED_FOLDER}/{assetPrefix}_Normal.png";
-            string matPath = $"{GENERATED_FOLDER}/{assetPrefix}_Mat.mat";
+            string safePrefix = SanitizeAssetPrefix(assetPrefix);
+            string diffusePath = $"{GENERATED_FOLDER}/{safePrefix}_Diffuse.png";
+            string normalPath = $"{GENERATED_FOLDER}/{safePrefix}_Normal.png";
+            string matPath = $"{GENERATED_FOLDER}/{safePrefix}_Mat.mat";
 
             // 1. Write diffuse PNG
             byte[] diffusePng = previewDiffuseTexture.EncodeToPNG();
@@ -531,20 +591,13 @@ namespace TileForge.Editor
             // 5. Spawn in Scene if requested
             if (spawnInScene && importedSprite != null)
             {
-                GameObject platformObj = new GameObject(assetPrefix);
+                GameObject platformObj = new GameObject(safePrefix);
                 var sr = platformObj.AddComponent<SpriteRenderer>();
                 sr.sprite = importedSprite;
                 sr.material = mat;
 
                 var poly = platformObj.AddComponent<PolygonCollider2D>();
-                // Set default bounding box or polygon collider points
-                poly.points = new Vector2[]
-                {
-                    new Vector2(-0.5f, -0.5f),
-                    new Vector2(0.5f, -0.5f),
-                    new Vector2(0.5f, 0.5f),
-                    new Vector2(-0.5f, 0.5f)
-                };
+                poly.points = BuildColliderPoints();
 
                 Selection.activeGameObject = platformObj;
                 Undo.RegisterCreatedObjectUndo(platformObj, "Spawn TileForge Tile");

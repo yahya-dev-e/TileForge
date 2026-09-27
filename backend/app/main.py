@@ -1,13 +1,14 @@
 """FastAPI Application Server for TileForge AI."""
 
 import io
+import os
 import time
 import base64
 import logging
 from contextlib import asynccontextmanager
-from typing import List
+from typing import List, Optional
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
@@ -16,7 +17,7 @@ from .schemas import (
     TileResponse,
     HealthResponse,
     PromptPreset,
-    Point2D
+    ColliderPolygon
 )
 from .model_runner import (
     initialize_model,
@@ -34,6 +35,23 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("tileforge.api")
+
+# Shared-secret API key gate. Unset by default so local/loopback usage keeps working
+# without extra setup; set TILEFORGE_API_KEY before exposing the server via ngrok/cloud.
+API_KEY = os.environ.get("TILEFORGE_API_KEY")
+
+
+def require_api_key(x_api_key: Optional[str] = Header(default=None)):
+    """Rejects the request unless it carries a matching X-API-Key header.
+
+    No-op when TILEFORGE_API_KEY is unset, so local development needs no
+    configuration; set the env var before exposing the server publicly.
+    """
+    if API_KEY and x_api_key != API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid API key."
+        )
 
 
 # Helper functions for image serialization
@@ -154,7 +172,7 @@ def get_prompt_presets():
     ]
 
 
-@app.post("/api/v1/generate-tile", response_model=TileResponse)
+@app.post("/api/v1/generate-tile", response_model=TileResponse, dependencies=[Depends(require_api_key)])
 def generate_tile(req: TileRequest):
     """End-to-end endpoint: Generates diffuse tile, seamless wrapping, normal map, and polygon colliders."""
     t0 = time.time()
@@ -201,13 +219,14 @@ def generate_tile(req: TileRequest):
         normal_b64 = pil_to_base64_png(normal_image)
 
     # 4. Polygon Collider Extraction
-    collider_polys: List[List[Point2D]] = []
+    collider_polys: List[ColliderPolygon] = []
     if req.generate_collider:
-        collider_polys = extract_polygon_colliders(
+        raw_polys = extract_polygon_colliders(
             diffuse_image,
             tolerance=req.collider_tolerance,
             alpha_threshold=req.collider_alpha_threshold
         )
+        collider_polys = [ColliderPolygon(points=poly) for poly in raw_polys]
 
     elapsed_ms = round((time.time() - t0) * 1000.0, 2)
     hw = get_hardware_info()
@@ -220,6 +239,7 @@ def generate_tile(req: TileRequest):
         normal_map_base64=normal_b64,
         collider_polygons=collider_polys,
         metadata={
+            "engine": "SD-Turbo" if hw["model_loaded"] else "Procedural Fallback",
             "device": hw["device"],
             "gpu_name": hw["gpu_name"],
             "seamless": req.seamless,
