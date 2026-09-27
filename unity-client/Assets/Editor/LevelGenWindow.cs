@@ -73,13 +73,17 @@ namespace TileForge.Editor
         }
 
         // GUI State & Parameters
-        private string serverUrl = DEFAULT_SERVER_URL;
-        private string apiKey = "";
-        private string assetPrefix = "DungeonTile_01";
-        private string prompt = "weathered ancient dungeon cobblestone wall, grey mossy stones, dark mortar, flat 2d game texture, seamless platformer tile, top-down orthographic";
-        private string negativePrompt = "blurry, 3d perspective, isometric, shadows, vignette, watermarks, character, noisy";
-        
-        private int selectedPresetIndex = 0;
+        // [SerializeField] is required on every field below so Unity persists it across
+        // domain reloads (any script recompile) - without it, EditorWindow fields silently
+        // reset to their initializer default, which made serverUrl/apiKey revert to
+        // 127.0.0.1 with no visible cause.
+        [SerializeField] private string serverUrl = DEFAULT_SERVER_URL;
+        [SerializeField] private string apiKey = "";
+        [SerializeField] private string assetPrefix = "DungeonTile_01";
+        [SerializeField] private string prompt = "weathered ancient dungeon cobblestone wall, grey mossy stones, dark mortar, flat 2d game texture, seamless platformer tile, top-down orthographic";
+        [SerializeField] private string negativePrompt = "blurry, 3d perspective, isometric, shadows, vignette, watermarks, character, noisy";
+
+        [SerializeField] private int selectedPresetIndex = 0;
         private readonly string[] presetNames = new string[]
         {
             "Ancient Dungeon Cobblestone",
@@ -90,15 +94,15 @@ namespace TileForge.Editor
             "Steampunk Rusted Brass Tiles"
         };
 
-        private int steps = 2;
-        private float guidanceScale = 1.5f;
-        private int seed = -1;
-        private bool randomizeSeed = true;
-        private bool seamless = true;
-        private bool generateNormal = true;
-        private float normalStrength = 2.5f;
-        private bool generateCollider = true;
-        private float colliderTolerance = 2.0f;
+        [SerializeField] private int steps = 2;
+        [SerializeField] private float guidanceScale = 1.5f;
+        [SerializeField] private int seed = -1;
+        [SerializeField] private bool randomizeSeed = true;
+        [SerializeField] private bool seamless = true;
+        [SerializeField] private bool generateNormal = true;
+        [SerializeField] private float normalStrength = 2.5f;
+        [SerializeField] private bool generateCollider = true;
+        [SerializeField] private float colliderTolerance = 2.0f;
 
         // Runtime Async State
         private bool isRequestActive = false;
