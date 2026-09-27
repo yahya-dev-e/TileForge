@@ -65,14 +65,14 @@ echo "=========================================================="
 echo "🎉 Setup Complete! To start the TileForge Backend Service:"
 echo "   source $VENV_DIR/bin/activate"
 echo "   cd $SCRIPT_DIR"
-echo "   uvicorn app.main:app --host 0.0.0.0 --port 8000"
+echo "   uvicorn app.main:app --host 0.0.0.0 --port 9000"
 echo ""
-echo "🌐 API Endpoint: http://$PUBLIC_IP:8000"
-echo "📖 Swagger Docs: http://$PUBLIC_IP:8000/docs"
+echo "🌐 API Endpoint: http://$PUBLIC_IP:9000"
+echo "📖 Swagger Docs: http://$PUBLIC_IP:9000/docs"
 echo "=========================================================="
 
 # Auto-launch option if passed --start
 if [[ "${1:-}" == "--start" ]]; then
     cd "$SCRIPT_DIR"
-    exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+    exec uvicorn app.main:app --host 0.0.0.0 --port 9000
 fi
