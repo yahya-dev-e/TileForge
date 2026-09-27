@@ -10,15 +10,21 @@ donc pas de risque d'OOM à ce niveau.
 
 ## 1. Ouvrir un terminal sur l'instance
 
-Pas besoin de configurer SSH à la main. Depuis ta machine, avec le Brev CLI déjà installé et connecté (`brev login`) :
+Depuis ton terminal **WSL** (celui où tu as fait `brev login`) :
 
 ```bash
-brev open tileforge cursor
+brev shell tileforge
 ```
 
-Ça ouvre Cursor connecté directement à l'instance `tileforge`, avec un terminal intégré déjà
-sur la bonne machine. Toutes les commandes ci-dessous s'exécutent dans ce terminal (sur
-l'instance, pas sur ta machine locale).
+> Sous WSL, `brev open tileforge cursor` ne fonctionne pas : la commande enregistre l'alias
+> SSH `tileforge` dans le `~/.ssh/config` de WSL, mais Cursor est une appli Windows native
+> qui lit le `.ssh/config` de Windows — qui ne connaît pas cet alias (`Could not resolve
+> hostname tileforge`). `brev shell` gère le SSH entièrement à l'intérieur de WSL et évite
+> ce conflit ; utilise `nano`/`vim` en ligne de commande pour éditer les fichiers (pas
+> d'éditeur graphique dans ce chemin).
+
+Toutes les commandes ci-dessous s'exécutent dans ce terminal (sur l'instance, pas sur ta
+machine locale).
 
 ## 2. Récupérer le code
 
@@ -57,7 +63,7 @@ Génère un vrai secret et colle-le dans `.env` :
 openssl rand -hex 32
 ```
 
-Édite `backend/.env` (déjà ouvert dans Cursor) pour qu'il ressemble à :
+Édite `backend/.env` (ex. `nano .env`) pour qu'il ressemble à :
 
 ```
 TILEFORGE_API_KEY=<le-secret-généré-ci-dessus>
@@ -97,16 +103,17 @@ seul le port 22 apparaît actuellement) :
    réseaux pendant le hackathon).
 3. Clique **Expose Port**.
 
-Une nouvelle ligne apparaît dans le tableau **TCP/UDP Ports**, sur le même modèle que la
-ligne SSH existante (`global.prd.ga.run.brev.nvidia.com:38300` → port 22) mais pour le port
-8000. Note l'**Endpoint** et le **Public Port** que Brev t'attribue à ce moment-là — c'est
-cette adresse (pas l'IP `54.159.8.64` brute) qu'on utilise dans Unity.
+Contrairement au port SSH (proxié via `global.prd.ga.run.brev.nvidia.com:38300`), le port
+8000 exposé s'ouvre directement sur l'IP publique de l'instance — confirmé en visitant
+`http://54.159.8.64:8000/health` dans un navigateur, qui répond `{"status":"ok",
+"device":"cuda","gpu_name":"NVIDIA A10G","model_loaded":true}`. Pas besoin de chercher un
+endpoint séparé, `54.159.8.64:8000` est la bonne adresse.
 
 ## 6. Configurer Unity
 
 Dans `Window > TileForge > Level Generator` :
 
-1. **Server URL** : `http://<endpoint-noté-à-l-étape-5>:<public-port>`
+1. **Server URL** : `http://54.159.8.64:8000`
 2. **API Key** : colle exactement le secret généré à l'étape 3.
 3. Clique **Test Connection** → le statut doit passer au vert.
 
