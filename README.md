@@ -169,6 +169,23 @@ The suite validates seamless edge processing, normal-map generation, polygon ext
 
 ---
 
+### Mock Payloads for the Unity Team
+
+Unity devs can build the Editor UI and test sprite/material/collider wiring without waiting for the backend to
+be deployed. Generate static example responses for each curated preset:
+
+```bash
+python backend/generate_mock_payloads.py
+```
+
+This writes one JSON file per preset to `backend/test_data/mock_payloads/`, e.g. `dungeon_stone.json`. Each file
+is produced by calling the real `generate_tile` endpoint function in-process (using the procedural fallback, so
+no GPU or model weights are needed) and dumping the actual `TileResponse` Pydantic model — so the mock JSON can
+never drift from the live API contract. Load one with `File.ReadAllText(...)` + `JsonUtility.FromJson<TileResponsePayload>(...)`
+in `LevelGenWindow.cs` to test locally.
+
+---
+
 ### Option B: Cloud GPU (Brev / Lambda / RunPod)
 
 Run the one-click provisioning script on any Ubuntu GPU instance:
