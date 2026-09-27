@@ -14,7 +14,7 @@ namespace TileForge.Editor
     /// </summary>
     public class LevelGenWindow : EditorWindow
     {
-        private const string DEFAULT_SERVER_URL = "http://127.0.0.1:8000";
+        private const string DEFAULT_SERVER_URL = "http://54.159.8.64:8000";
         private const string GENERATED_FOLDER = "Assets/Generated";
 
         [Serializable]
