@@ -6,11 +6,18 @@ import time
 import base64
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import List, Optional
 
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
+
+# Loads backend/.env (this file lives at backend/app/main.py, so parent.parent
+# is backend/) regardless of the working directory uvicorn was started from.
+# No-op if the file doesn't exist, e.g. in local dev or CI.
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 from .schemas import (
     TileRequest,
@@ -37,7 +44,8 @@ logging.basicConfig(
 logger = logging.getLogger("tileforge.api")
 
 # Shared-secret API key gate. Unset by default so local/loopback usage keeps working
-# without extra setup; set TILEFORGE_API_KEY before exposing the server via ngrok/cloud.
+# without extra setup; set TILEFORGE_API_KEY (via backend/.env or the shell env)
+# before exposing the server via ngrok/cloud.
 API_KEY = os.environ.get("TILEFORGE_API_KEY")
 
 
